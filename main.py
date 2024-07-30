@@ -1,36 +1,38 @@
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
+from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import accuracy_score
 
-# Load the dataset
-# Create some random data
-np.random.seed(0)
-X = 2 * np.random.rand(100, 1)
-y = 4 + 3 * X + np.random.randn(100, 1)
+# Sample data
+texts = [
+    "I love this product",
+    "This is the best thing ever",
+    "I am so happy with this",
+    "I hate this product",
+    "This is the worst thing ever",
+    "I am so unhappy with this"
+]
 
-# Visualize the data
-plt.scatter(X, y)
-plt.xlabel('X')
-plt.ylabel('y')
-plt.show()
+# Corresponding labels (1 for positive, 0 for negative)
+labels = [1, 1, 1, 0, 0, 0]
+
+vectorizer = CountVectorizer()
+X = vectorizer.fit_transform(texts)
+
+# Convert labels to a NumPy array
+y = np.array(labels)
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-model = LinearRegression()
+model = MultinomialNB()
+
 model.fit(X_train, y_train)
-
 y_pred = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+print(f'Accuracy: {accuracy}')
 
-print(f"Mean Squared Error: {mean_squared_error(y_test, y_pred)}")
-print(f"R2 Score: {r2_score(y_test, y_pred)}")
-
-# Visualize the regression line
-plt.scatter(X_test, y_test, color='black')
-plt.plot(X_test, y_pred, color='blue', linewidth=3)
-plt.xlabel('X')
-plt.ylabel('y')
-plt.show()
-print("done")
+new_texts = ["I am very happy with this service", "This is a terrible experience"]
+new_X = vectorizer.transform(new_texts)
+predictions = model.predict(new_X)
+print(predictions)  # Output will be an array of predicted labels
